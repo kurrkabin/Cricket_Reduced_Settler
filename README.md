@@ -1,6 +1,6 @@
 # 🏏 Cricket Reduced Matches Tool
 
-**Cricket Reduced Matches Tool** is a specialized rules engine built in Python to dynamically evaluate betting market validity for cricket matches affected by overs reductions. This project adheres strictly to the official DraftKings (DK) Cricket House Rules and supports formats including **Test**, **ODI**, and **T20**.
+**Cricket Reduced Matches Tool** is a specialized rules engine built in Python to dynamically evaluate betting market validity for cricket matches affected by overs reductions. This project adheres strictly to the official DraftKings (DK) Cricket House Rules and supports formats including **ODI**, and **T20**.
 
 ---
 
@@ -15,7 +15,7 @@ This tool assists sportsbook operators, traders, and analysts in evaluating whet
 
 ## ⚙️ Features
 
-- ✅ Supports 3 formats: **T20**, **ODI**, **Test**
+- ✅ Supports 3 formats: **T20**, **ODI**
 - ✅ 100% aligned with **DraftKings Cricket House Rules**
 - ✅ Market-by-market assessment (e.g., Most Fours, Player Milestones, etc.)
 - ✅ Interactive widget-based UI (via `ipywidgets`)
