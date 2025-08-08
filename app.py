@@ -144,4 +144,23 @@ if st.button("Evaluate Markets"):
         status = fn(ctx)
         colour = "🟥" if "VOID" in status else "🟩" if "STANDS" in status else "🟧"
         st.markdown(f"{i:02}. **{name}** — {status} {colour}")
+       # ---------- subtle usage counter (persistent if possible) ----------
+    try:
+        import json
+        from pathlib import Path
+        COUNTER_FILE = Path("usage_count.json")
+        data = {}
+        if COUNTER_FILE.exists():
+            try:
+                data = json.loads(COUNTER_FILE.read_text() or "{}")
+            except Exception:
+                data = {}
+        total_uses = int(data.get("count", 0)) + 1
+        data["count"] = total_uses
+        COUNTER_FILE.write_text(json.dumps(data))
+    except Exception:
+        # Fallback: per-session count only (doesn't persist across restarts)
+        total_uses = st.session_state.get("_session_count", 0) + 1
+        st.session_state["_session_count"] = total_uses
 
+    st.caption(f"Used {total_uses} times.")
