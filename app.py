@@ -162,19 +162,21 @@ if st.button("Evaluate Markets"):
     red  = red_to if red_to > 0 else orig
 
     ctx = dict(
-        stage=stage,
-        overs_done=overs_done,
-        reduced=red,
-        orig=orig,
-        sched=red,                    # current scheduled overs after reduction
-        min_rule=FMT_MIN[fmt],
-        red_thr=RED_THR[fmt],
-        top_min=None,                 # kept for backward-compat (unused now)
-    )
-        det_line_passed=det_line_passed,
-        det_wicket_fell=det_wicket_fell,
-        det_hop_done=det_hop_done,
-    )
+    stage=stage,
+    overs_done=overs_done,
+    reduced=red,
+    orig=orig,
+    sched=red,                    # current scheduled overs after reduction
+    min_rule=FMT_MIN[fmt],
+    red_thr=RED_THR[fmt],
+    top_min=None,                 # kept for backward-compat (unused now)
+
+    # NEW goes-on flags:
+    det_line_passed=det_line_passed,
+    det_wicket_fell=det_wicket_fell,
+    det_hop_done=det_hop_done,
+)
+
     st.markdown(f"**Status** — {fmt}: **{orig} → {red}** overs, stage = **{stage}**")
 
     for i, (name, fn) in enumerate(market_meta, 1):
