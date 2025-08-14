@@ -171,9 +171,9 @@ if st.button("Evaluate Markets"):
         red_thr=RED_THR[fmt],
         top_min=None,                 # kept for backward-compat (unused now)
     )
-    det_line_passed=det_line_passed,
-    det_wicket_fell=det_wicket_fell,
-    det_hop_done=det_hop_done,
+        det_line_passed=det_line_passed,
+        det_wicket_fell=det_wicket_fell,
+        det_hop_done=det_hop_done,
     )
     st.markdown(f"**Status** — {fmt}: **{orig} → {red}** overs, stage = **{stage}**")
 
