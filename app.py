@@ -25,6 +25,7 @@ GOES_ON_MARKETS = {
     # If you later add these markets, they will automatically get the note:
     "Batter Total Fours",
     "Batter Total Sixes",
+    
 }
 ALWAYS_YELLOW_MARKETS = {
     "Bowler Match Bet",
@@ -114,6 +115,18 @@ market_meta = [
 
     # ---------- batter totals (80 % rule) ----------
     ("Batter Total Runs",   lambda c: _pct_or_goes_on(c, COMPLETE_PCT, c.get("det_line_passed"))),
+
+    # ---------- batter totals (80 % rule) ----------
+    ("Batter Total Runs",   lambda c: _pct_or_goes_on(c, COMPLETE_PCT, c.get("det_line_passed"))),
+
+    # ---------- named-batter fours/sixes (80% + GOES-ON applies) ----------
+    ("Batter Total Fours",  lambda c: _pct_rule(c, COMPLETE_PCT)),
+    ("Batter Total Sixes",  lambda c: _pct_rule(c, COMPLETE_PCT)),
+
+    # ---------- bowler totals (80% + must bowl ≥1 ball; NO goes-on) ----------
+    ("Bowler Total Wickets (must bowl ≥1 delivery; super over excluded)",
+    lambda c: _pct_rule(c, COMPLETE_PCT)),
+
 
     # ---------- powerplay / segment ----------
     ("Team Highest 1st 6 Overs",   lambda c:
