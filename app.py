@@ -146,16 +146,6 @@ if stage != "before":
     overs_done = st.number_input(
         "Overs done at reduction", min_value=0.0, step=0.1, value=0.0
     )
-with st.expander("Mark outcome as determined (overrides 80% where applicable)"):
-    det_line_passed = st.checkbox(
-        "Line passed / Batter dismissed (Batter totals & 50+/100+)", value=False
-    )
-    det_wicket_fell = st.checkbox(
-        "Wicket fell / line passed (Fall of 1st Wicket)", value=False
-    )
-    det_hop_done = st.checkbox(
-        "HOP determined (both opening wickets fell in each innings, OR chase surpassed OP)", value=False
-    )
 
 if st.button("Evaluate Markets"):
     orig = 20 if fmt == "T20" else 50
@@ -172,18 +162,21 @@ if st.button("Evaluate Markets"):
     top_min=None,                 # kept for backward-compat (unused now)
 
     # NEW goes-on flags:
-    det_line_passed=det_line_passed,
-    det_wicket_fell=det_wicket_fell,
-    det_hop_done=det_hop_done,
+    det_line_passed=False,
+    det_wicket_fell=False,
+    det_hop_done=False,
 )
 
     st.markdown(f"**Status** — {fmt}: **{orig} → {red}** overs, stage = **{stage}**")
 
     for i, (name, fn) in enumerate(market_meta, 1):
         status = fn(ctx)
-        colour = "🟥" if "VOID" in status else "🟩" if "STANDS" in status else "🟧"
-        extra = " 🟨" if name in GOES_ON_MARKETS else ""
-        st.markdown(f"{i:02}. **{name}** — {status} {colour}{extra}{_goes_on_note(name)}")
+        if name in GOES_ON_MARKETS:
+            colour = "🟨"
+        else:
+            colour = "🟥" if "VOID" in status else "🟩" if "STANDS" in status else "🟧"
+
+        st.markdown(f"{i:02}. **{name}** — {status} {colour}{_goes_on_note(name)}")
 
        # ---------- subtle usage counter (persistent if possible) ----------
     try:
