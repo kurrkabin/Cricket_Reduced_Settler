@@ -131,12 +131,8 @@ fmt = st.selectbox(
 
 stage = st.selectbox(
     "When reduced",
-    ["before", "during1", "during2"],
-    format_func=lambda v: {
-        "before": "Before start",
-        "during1": "During 1st innings",
-        "during2": "During 2nd innings",
-    }[v],
+    ["before"],
+    format_func=lambda v: {"before": "Before start"}[v],
 )
 
 red_to = st.number_input("Reduced to (overs scheduled)", min_value=0, step=1, value=0)
@@ -172,11 +168,14 @@ if st.button("Evaluate Markets"):
     for i, (name, fn) in enumerate(market_meta, 1):
         status = fn(ctx)
         if name in GOES_ON_MARKETS:
+            # Mask the computed status; always show neutral yellow advisory
+            status = "Depends — GOES-ON applies"
             colour = "🟨"
         else:
             colour = "🟥" if "VOID" in status else "🟩" if "STANDS" in status else "🟧"
 
-        st.markdown(f"{i:02}. **{name}** — {status} {colour}{_goes_on_note(name)}")
+        st.markdown(f"{i:02}. **{name}** — {status} {colour}")
+
 
        # ---------- subtle usage counter (persistent if possible) ----------
     try:
