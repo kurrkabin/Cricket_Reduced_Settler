@@ -15,11 +15,35 @@ FMT_MIN   = {"ODI": 40, "T20": 20}         # for 50 / 100-score markets
 RED_THR   = {"ODI": 5,  "T20": 3}          # void if ≥ this many overs lost (team totals etc.)
 TOP_PCT   = 0.50                           # Top Batter/Bowler – at least 50 % overs
 COMPLETE_PCT = 0.80                        # 80 % completion rule (Batter 50+, Fall 1st Wkt…)
+# Markets that have the "goes on to be determined" carve-out
+GOES_ON_MARKETS = {
+    "Highest Opening Partnership",
+    "Fall of 1st Wicket",
+    "Batter Total Runs",
+    "Batter to Score 50+ Runs",
+    "Batter to Score 100+ Runs",
+    # If you later add these markets, they will automatically get the note:
+    "Batter Total Fours",
+    "Batter Total Sixes",
+}
 
 # ---------- helpers ----------
 def _pct_rule(ctx, pct) -> str:
     """Return STANDS if scheduled overs ≥ pct * original scheduled overs."""
     return "STANDS" if ctx["reduced"] >= pct * ctx["orig"] else "VOID/CANCEL"
+def _pct_or_goes_on(ctx, pct, determined: bool) -> str:
+    """
+    80% scheduled-overs proxy WITH 'goes on to be determined' override.
+    If the proxy passes -> STANDS.
+    If proxy fails -> STANDS only if 'determined' flag is True, else VOID.
+    """
+    if ctx["reduced"] >= pct * ctx["orig"]:
+        return "STANDS"
+    return "STANDS (GOES-ON determined)" if determined else "VOID/CANCEL"
+
+def _goes_on_note(name: str) -> str:
+    # Visual hint on markets where the carve-out applies
+    return " — *GOES-ON applies*" if name in GOES_ON_MARKETS else ""
 
 # ---------- market rules ----------
 market_meta = [
@@ -50,8 +74,8 @@ market_meta = [
         "STANDS" if c["sched"] >= c["min_rule"] else "VOID/CANCEL"),
 
     # ---------- named-batter milestones ----------
-    ("Batter to Score 50+ Runs",   lambda c: _pct_rule(c, COMPLETE_PCT)),
-    ("Batter to Score 100+ Runs",  lambda c: _pct_rule(c, COMPLETE_PCT)),
+    ("Batter to Score 50+ Runs",  lambda c: _pct_or_goes_on(c, COMPLETE_PCT, c.get("det_line_passed"))),
+    ("Batter to Score 100+ Runs", lambda c: _pct_or_goes_on(c, COMPLETE_PCT, c.get("det_line_passed"))),
 
     # ---------- Most fours/sixes must have full overs ----------
     ("Most Match Sixes",           lambda c:
@@ -68,8 +92,8 @@ market_meta = [
     ("Most Run Outs",              lambda c: "STANDS"),   # only void on total abandonment
 
     # ---------- wicket & partnership props (80 % rule) ----------
-    ("Fall of 1st Wicket",         lambda c: _pct_rule(c, COMPLETE_PCT)),
-    ("Highest Opening Partnership",lambda c: _pct_rule(c, COMPLETE_PCT)),
+    ("Fall of 1st Wicket",  lambda c: _pct_or_goes_on(c, COMPLETE_PCT, c.get("det_wicket_fell") or c.get("det_line_passed"))),
+    ("Highest Opening Partnership", lambda c: _pct_or_goes_on(c, COMPLETE_PCT, c.get("det_hop_done"))),
 
     # ---------- totals void if overs lost ≥ threshold ----------
     ("Total Match Sixes",          lambda c:
@@ -85,7 +109,7 @@ market_meta = [
     ("Batter Match Bet",           lambda c: "Depends (need batter status)"),
 
     # ---------- batter totals (80 % rule) ----------
-    ("Batter Total Runs",          lambda c: _pct_rule(c, COMPLETE_PCT)),
+    ("Batter Total Runs",   lambda c: _pct_or_goes_on(c, COMPLETE_PCT, c.get("det_line_passed"))),
 
     # ---------- powerplay / segment ----------
     ("Team Highest 1st 6 Overs",   lambda c:
@@ -122,6 +146,16 @@ if stage != "before":
     overs_done = st.number_input(
         "Overs done at reduction", min_value=0.0, step=0.1, value=0.0
     )
+with st.expander("Mark outcome as determined (overrides 80% where applicable)"):
+    det_line_passed = st.checkbox(
+        "Line passed / Batter dismissed (Batter totals & 50+/100+)", value=False
+    )
+    det_wicket_fell = st.checkbox(
+        "Wicket fell / line passed (Fall of 1st Wicket)", value=False
+    )
+    det_hop_done = st.checkbox(
+        "HOP determined (both opening wickets fell in each innings, OR chase surpassed OP)", value=False
+    )
 
 if st.button("Evaluate Markets"):
     orig = 20 if fmt == "T20" else 50
@@ -137,13 +171,18 @@ if st.button("Evaluate Markets"):
         red_thr=RED_THR[fmt],
         top_min=None,                 # kept for backward-compat (unused now)
     )
-
+        det_line_passed=det_line_passed,
+        det_wicket_fell=det_wicket_fell,
+        det_hop_done=det_hop_done,
+    )
     st.markdown(f"**Status** — {fmt}: **{orig} → {red}** overs, stage = **{stage}**")
 
     for i, (name, fn) in enumerate(market_meta, 1):
         status = fn(ctx)
         colour = "🟥" if "VOID" in status else "🟩" if "STANDS" in status else "🟧"
-        st.markdown(f"{i:02}. **{name}** — {status} {colour}")
+        extra = " 🟨" if name in GOES_ON_MARKETS else ""
+        st.markdown(f"{i:02}. **{name}** — {status} {colour}{extra}{_goes_on_note(name)}")
+
        # ---------- subtle usage counter (persistent if possible) ----------
     try:
         import json
