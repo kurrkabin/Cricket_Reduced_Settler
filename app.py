@@ -26,6 +26,10 @@ GOES_ON_MARKETS = {
     "Batter Total Fours",
     "Batter Total Sixes",
 }
+ALWAYS_YELLOW_MARKETS = {
+    "Bowler Match Bet",
+    "Batter Match Bet",
+}
 
 # ---------- helpers ----------
 def _pct_rule(ctx, pct) -> str:
