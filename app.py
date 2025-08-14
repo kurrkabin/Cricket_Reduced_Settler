@@ -176,7 +176,7 @@ if st.button("Evaluate Markets"):
             status = "Depends — GOES-ON applies"
             colour = "🟨"
         else:
-            colour = "🟥" if "VOID" in status else "🟩" if "STANDS" in status else "🟧"
+            colour = "🟥" if "VOID" in status else "🟩" if "STANDS" in status else "🟨"
 
         st.markdown(f"{i:02}. **{name}** — {status} {colour}")
 
