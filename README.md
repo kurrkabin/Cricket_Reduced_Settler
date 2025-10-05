@@ -1,43 +1,17 @@
-# 🏏 Cricket Reduced Matches Tool
+Built an automation tool that validates how each cricket market should be settled when a match is shortened before it starts (due to rain, weather, or scheduling).
+The app mirrors DraftKings’ official house rules and helps traders make consistent settlement calls without manually scanning PDFs or spreadsheets.
 
-**Cricket Reduced Matches Tool** is a specialized rules engine built in Python to dynamically evaluate betting market validity for cricket matches affected by overs reductions. This project adheres strictly to the official DraftKings (DK) Cricket House Rules and supports formats including **ODI** and **T20**.
+Key points:
 
----
+Encodes 50+ settlement scenarios for ODI & T20 formats (e.g., Top Batter, Total Sixes, Fall of 1st Wicket).
 
-## 📌 Purpose
+Converts natural-language house rules into executable logic via AI-assisted rule translation.
 
-This tool assists sportsbook operators, traders, and analysts in evaluating whether specific betting markets should **stand** or be **voided** when:
-- A match is shortened before or during play.
-- Overs are reduced due to weather or unforeseen events.
-- Specific DK-defined thresholds and rules must be enforced per market.
+Delivers instant “STANDS/VOID/DEPENDS” outputs per market, minimizing error rates and improving handover speed.
 
----
+Used internally to standardize decision logic across traders and shifts.
 
-## ⚙️ Features
+Includes a built-in usage tracker for lightweight analytics and audit trail.
 
-- ✅ Supports 2 formats: **T20**, **ODI**
-- ✅ 100% aligned with **DraftKings Cricket House Rules**
-- ✅ Market-by-market assessment (e.g., Most Fours, Player Milestones, etc.)
-- ✅ Interactive widget-based UI (via `ipywidgets`)
-- ✅ Copy-paste DK rule viewer for transparency
-- ✅ Easily extendable market logic
-
----
-
-## 📚 Tech Stack
-
-- **Python 3.10+**
-- `ipywidgets` + `IPython.display` for interactive Jupyter UI
-- `re` & `unicodedata` for fuzzy text rule parsing
-
----
-
-## 🧠 AI & Automation
-
-This tool demonstrates:
-- Domain-specific rules automation
-- Contextual reasoning aligned with real-world regulatory language
-- Usage of LLMs to extract, validate, and translate written policy (DK rules) into executable logic
-- Practical application of **AI-assisted decision frameworks** in sports betting
-
----
+Impact:
+Reduced settlement ambiguity, improved consistency between traders, and demonstrated how rule interpretation can be automated using lightweight Python + Streamlit frameworks.
