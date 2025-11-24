@@ -165,17 +165,29 @@ if run:
     st.markdown(
         f"### Status\n**{fmt}**: {orig} → {red} overs, reduction: {stage}"
     )
+   # Replace your loop with this block (same semantics, uses Unicode emojis)
+EMOJI = {"green": "🟩", "red": "🟥", "yellow": "🟨"}
 
-    # Build result lines
-    lines = []
-    for i, (name, fn) in enumerate(market_meta, 1):
-        status = fn(ctx)
-        # GOES-ON masking (unchanged logic; treat ' — Depends' variants as GOES-ON)
-        if name in GOES_ON_MARKETS:
-            status = "Depends — GOES-ON applies" if status == "VOID/CANCEL" else status
-            colour = ":large_yellow_square:" if "Depends" in status else (":large_red_square:" if "VOID" in status else ":large_green_square:")
-        else:
-            colour = ":large_red_square:" if "VOID" in status else ":large_green_square:" if "STANDS" in status else ":large_yellow_square:"
-        lines.append(f"{i:02}. {name} — {status} {colour}")
+lines = []
+for i, (name, fn) in enumerate(market_meta, 1):
+    status = fn(ctx)
 
-    st.markdown("\n\n".join(lines))
+    # GOES-ON masking (treat ' — Depends' variants as GOES-ON)
+    if name in GOES_ON_MARKETS:
+        status = "Depends — GOES-ON applies" if status == "VOID/CANCEL" else status
+
+    # Determine color emoji from status text
+    if "VOID" in status or "CANCEL" in status:
+        colour = EMOJI["red"]
+    elif "STANDS" in status:
+        colour = EMOJI["green"]
+    else:
+        # anything else (Depends / Depends — GOES-ON applies / Depends (need...))
+        colour = EMOJI["yellow"]
+
+    lines.append(f"{i:02}. {name} — {status} {colour}")
+
+st.markdown("\n\n".join(lines))
+
+    
+
